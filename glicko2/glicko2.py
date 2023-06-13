@@ -1,17 +1,17 @@
 """
-Glicko-2 implementation
+Glicko-2 implementation in Python
 
 For reference see http://www.glicko.net/glicko/glicko2.pdf
 """
 
 import math
-from typing import Self
+from typing import Self, Tuple
 
-import numpy as np
+from scipy.stats import norm, logistic
 
 
 class Player:
-    """Player class to hold a player's rating, RD, volatility and skill (for simulation purposes)"""
+    """Player class to hold a player's rating, RD, volatility and "true" skill (for simulation purposes)"""
 
     def __init__(
         self,
@@ -26,9 +26,11 @@ class Player:
         if skill is not None:
             self.skill = skill
         else:
-            self.skill = np.random.normal(rating, rd)
+            self.skill = norm.rvs(rating, rd)
 
-    def update(self, opponents: list[Self] | Self, s: list[float], tau: float) -> None:
+    def update(
+        self, opponents: list[Self] | Self, s: list[float] | float, tau: float
+    ) -> None:
         """Updates a player's rating against opponents with outcomes s
         (1 = win, 0.5 = tie, 0 = loss)
 
@@ -40,6 +42,9 @@ class Player:
 
         if isinstance(opponents, Player):
             opponents = [opponents]
+
+        if not isinstance(s, list):
+            s = [s]
 
         mu_j = list(map(lambda o: (o.rating - 1500) / 173.7178, opponents))
         phi_j = list(map(lambda o: o.rd / 173.7178, opponents))
@@ -122,3 +127,51 @@ class Player:
         self.rating = 173.7178 * mu_new + 1500
         self.rd = 173.7178 * phi_new
         self.volatility = sigma_new
+
+    @staticmethod
+    def expected_outcome(player1: "Player", player2: "Player") -> float:
+        """Return expected outcome of a match based on player ratings.
+
+        From original Glicko paper, http://www.glicko.net/glicko/glicko.pdf
+        """
+        q = math.log(10) / 400
+
+        def g(RD):
+            return 1 / math.sqrt(
+                1 + 3 * math.pow(q, 2) * math.pow(RD, 2) / math.pow(math.pi, 2)
+            )
+
+        def E(r_i, r_j, RD_i, RD_j):
+            return 1 / (
+                1
+                + math.pow(
+                    10,
+                    (
+                        -g(math.sqrt(math.pow(RD_i, 2) + math.pow(RD_j, 2)))
+                        * (r_i - r_j)
+                        / 400
+                    ),
+                )
+            )
+
+        return E(player1.rating, player2.rating, player1.rd, player2.rd)
+
+    def ci(self, alpha=0.05) -> Tuple[float, float]:
+        """Calculate the confidence interval for a player's rating with coverage 1-alpha.
+        By default calculates the 95% confidence interval."""
+
+        q = norm.ppf(1 - alpha / 2).item(0)
+        return (self.rating - q * self.rd, self.rating + q * self.rd)
+
+    @staticmethod
+    def true_expected_outcome(
+        player1: "Player", player2: "Player", s: float = 350
+    ) -> float:
+        """Calculate expected outcome using "hidden, true" skill attribute.
+
+        Uses a logistic distribution, other option would be to use a normal distribution. s = standard deviation of the scoring system.
+
+        Using logistic gives higher probabilities to "improbable" events and thus might be more suitable for real-life scenarios.
+        """
+
+        return logistic.cdf(player1.skill - player2.skill, scale=s).item(0)
