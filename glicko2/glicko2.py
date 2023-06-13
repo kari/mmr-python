@@ -31,10 +31,10 @@ class Player:
     def update(
         self, opponents: list[Self] | Self, s: list[float] | float, tau: float
     ) -> None:
-        """Updates a player's rating against opponents with outcomes s
+        """Updates a player's rating against opponents with outcomes `s`
         (1 = win, 0.5 = tie, 0 = loss)
 
-        Glicko-2 paper recommends tau is in range 0.3 - 1.2 but does not offer a default.
+        Glicko-2 paper recommends `tau` is in range 0.3 - 1.2 but does not offer a default.
         """
         mu = (self.rating - 1500) / 173.7178
         phi = self.rd / 173.7178
@@ -157,7 +157,7 @@ class Player:
         return E(player1.rating, player2.rating, player1.rd, player2.rd)
 
     def ci(self, alpha=0.05) -> Tuple[float, float]:
-        """Calculate the confidence interval for a player's rating with coverage 1-alpha.
+        """Calculate the confidence interval for a player's rating with coverage 1-`alpha`.
         By default calculates the 95% confidence interval."""
 
         q = norm.ppf(1 - alpha / 2).item(0)
@@ -169,7 +169,7 @@ class Player:
     ) -> float:
         """Calculate expected outcome using "hidden, true" skill attribute.
 
-        Uses a logistic distribution, other option would be to use a normal distribution. s = standard deviation of the scoring system.
+        Uses a logistic distribution, other option would be to use a normal distribution. `s` = standard deviation of the scoring system.
 
         Using logistic gives higher probabilities to "improbable" events and thus might be more suitable for real-life scenarios.
         """

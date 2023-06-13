@@ -1,6 +1,6 @@
 import pytest
 
-from .glicko2 import Player
+from glicko2 import Player
 
 
 def test_update_glicko2():
