@@ -28,6 +28,9 @@ class Player:
         else:
             self.skill = norm.rvs(rating, rd)
 
+    def __repr__(self):
+        return f"Player({self.rating},{self.rd},{self.volatility})"
+
     def update(
         self, opponents: list[Self] | Self, s: list[float] | float, tau: float
     ) -> None:
