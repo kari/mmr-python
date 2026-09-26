@@ -1,0 +1,47 @@
+[build-system]
+requires = ["uv_build>=0.12.11,<0.13.0"]
+build-backend = "uv_build"
+
+[project]
+name = "pymmr"
+description = "Skill rating algorithms: Glicko-2 and the Bayesian approximation method of Weng & Lin (2011)"
+readme = "README.md"
+license = "MPL-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Kari Silvennoinen" }]
+requires-python = ">=3.11"
+keywords = ["glicko", "glicko-2", "elo", "mmr", "rating", "trueskill", "bayesian"]
+classifiers = [
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Games/Entertainment",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = []
+version = "0.1.0"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "pytest-cov>=6", "mypy>=1.14", "ruff>=0.11"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers"]
+filterwarnings = ["error"]
+
+[tool.mypy]
+strict = true
+files = ["src", "tests"]
+
+[tool.ruff]
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "D", "ANN", "RUF"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
