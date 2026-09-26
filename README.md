@@ -23,8 +23,8 @@ uv add git+https://github.com/kari/mmr-python
 ## Usage — Glicko-2
 
 ```python
-from mmr import Glicko2Rating, Match
-from mmr.glicko2 import expected, rate
+from pymmr import Glicko2Rating, Match
+from pymmr.glicko2 import expected, rate
 
 player = Glicko2Rating()  # rating 1500, rd 350, volatility 0.06
 
@@ -54,8 +54,8 @@ Ratings are `(mu, sigma)` pairs; teams are lists of players. `ranks` gives
 each team's finishing position, lower is better, equal ranks count as draws.
 
 ```python
-from mmr import WengLinRating
-from mmr.weng11a import probs, rate
+from pymmr import WengLinRating
+from pymmr.weng11a import probs, rate
 
 teams = [[WengLinRating()], [WengLinRating()]]  # one player per team
 
@@ -70,7 +70,7 @@ probs(teams)  # [0.5, 0.5] — win probability of each team, sums to 1
 ```bash
 uv sync                                  # create .venv, install dev dependencies
 uv run pytest                            # run the test suite
-uv run pytest --cov=mmr                  # ... with a coverage report
+uv run pytest --cov=pymmr                 # ... with a coverage report
 uv run ruff check . && uv run ruff format --check .
 uv run mypy                              # type-check with mypy --strict
 ```
